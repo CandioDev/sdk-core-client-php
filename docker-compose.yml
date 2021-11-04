@@ -1,0 +1,14 @@
+version: "3.2"
+services:
+  core-client:
+    image: php:8.0-cli-alpine
+    volumes:
+      - ./:/app/
+    networks:
+      - candio
+    working_dir: /app/
+    entrypoint: php /app/test.php
+
+networks:
+  candio:
+    external: true
