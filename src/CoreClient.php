@@ -14,25 +14,32 @@ class CoreClient {
 	private Client $client;
 
 	/**
-	 * @param string $uri
+	 * @var array|null
 	 */
-	public function __construct(string $uri) {
-		$this->client = new Client(['base_uri' => $uri]);
+	private ?array $configData = null;
+
+	/**
+	 * @param string $url
+	 * @param string $value
+	 */
+	public function __construct(string $url, protected string $value) {
+		$this->client = new Client(['base_uri' => $url]);
 	}
 
 	protected function fetch(string $method, string $url, ?array $params) {
-		return json_decode((string) $this->client->{$method}($url, $params)->getBody());
+		return json_decode((string) $this->client->{$method}($url, $params)->getBody(), true);
 	}
 
-	public function getConfigById(string $id) {
-		return $this->fetch('get','get', ['id' => $id]);
+	public function getConfig() {
+		if (!$this->configData) {
+			$this->configData = $this->fetchConfig($this->value);
+		}
+
+		return $this->configData;
 	}
 
-	public function getConfigByCandioUri($uri) {
-		return $this->fetch('get','get', ['candioUrl' => $uri]);
+	public function fetchConfig($filter) {
+		return $this->fetch('get','get', ['filter' => $filter]);
 	}
 
-	public function getConfigByPortalUri($uri) {
-		return $this->fetch('get','get', ['portalUrl' => $uri]);
-	}
 }
